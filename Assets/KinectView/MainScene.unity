@@ -1906,13 +1906,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29d64f93ed4df2c4ba7ed87accd77ac3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AvatarSpineBase: {fileID: 2023382195}
+  AvatarSpineBase: {fileID: 0}
   AvatarSpineMid: {fileID: 0}
   AvatarNeck: {fileID: 0}
   AvatarHead: {fileID: 0}
-  AvatarShoulderLeft: {fileID: 0}
-  AvatarElbowLeft: {fileID: 0}
-  AvatarWristLeft: {fileID: 0}
+  AvatarShoulderLeft: {fileID: 565970983}
+  AvatarElbowLeft: {fileID: 481724088}
+  AvatarWristLeft: {fileID: 2009542548}
   AvatarHandLeft: {fileID: 0}
   AvatarHipLeft: {fileID: 0}
   AvatarKneeLeft: {fileID: 0}
@@ -1922,14 +1922,15 @@ MonoBehaviour:
   AvatarElbowRight: {fileID: 0}
   AvatarWristRight: {fileID: 0}
   AvatarHandRight: {fileID: 0}
-  AvatarHipRight: {fileID: 1679631779}
-  AvatarKneeRight: {fileID: 272316513}
-  AvatarAnkleRight: {fileID: 1133242123}
-  AvatarFootRight: {fileID: 1711595807}
+  AvatarHipRight: {fileID: 0}
+  AvatarKneeRight: {fileID: 0}
+  AvatarAnkleRight: {fileID: 0}
+  AvatarFootRight: {fileID: 0}
   AvatarHandTipLeft: {fileID: 0}
   AvatarThumbLeft: {fileID: 0}
   AvatarHandTipRight: {fileID: 0}
   AvatarThumbRight: {fileID: 0}
+  animatorComponent: {fileID: 245775128}
 --- !u!4 &1509802387
 Transform:
   m_ObjectHideFlags: 0

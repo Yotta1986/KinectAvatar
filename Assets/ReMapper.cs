@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ReMapper : MonoBehaviour {
 
+
 	private GameObject kinectSpineBase;
 	private GameObject kinectSpineMid;
 	private GameObject kinectNeck;
@@ -84,6 +85,53 @@ public class ReMapper : MonoBehaviour {
 	private GameObject[] kinectJointArray = new GameObject[24];
 	private GameObject[] avatarJointArray = new GameObject[24];
 
+
+
+	protected Transform[] bones;
+	protected Quaternion initialRotation;
+	protected Quaternion[] initialRotations;
+	protected Quaternion[] localRotations;
+	public Animator animatorComponent;
+	
+	private bool hasGetInitRot = false; 
+	public void Awake()
+	{
+		// // inits the bones array
+		// bones = new Transform[31];
+		// initialRotations = new Quaternion[bones.Length];
+		// localRotations = new Quaternion[bones.Length];
+
+		// // map bones
+		// for (int boneIndex = 0; boneIndex < bones.Length; boneIndex++)
+		// {
+		// 	if (!boneIndex2MecanimMap.ContainsKey(boneIndex)) 
+		// 		continue;
+			
+		// 	bones[boneIndex] = animatorComponent ? animatorComponent.GetBoneTransform(boneIndex2MecanimMap[boneIndex]) : null;
+		// }
+
+		// // get initial rotation
+		// for (int i = 0; i < bones.Length; i++)
+		// {
+		// 	if (bones[i] != null)
+		// 	{
+		// 		initialRotations[i] = bones[i].rotation;
+		// 		localRotations[i] = bones[i].localRotation;
+		// 	}
+		// }
+
+		initialRotation = transform.rotation;
+		initialRotations = new Quaternion[24];
+		int i;
+		for(i=0; i<24; i++)
+		{
+			if(kinectJointArray[i] && avatarJointArray[i])
+			{
+				initialRotations[i] = avatarJointArray[i].transform.rotation;
+			}
+		}
+
+	}
 	// Use this for initialization
 	void Start () {
 		//avatarPosition = transform.position;
@@ -111,6 +159,8 @@ public class ReMapper : MonoBehaviour {
 		avatarJointArray[21] = AvatarThumbLeft;
 		avatarJointArray[22] = AvatarHandTipRight;
 		avatarJointArray[23] = AvatarThumbRight;
+		
+
 	}
 	
 	// Update is called once per frame
@@ -168,24 +218,117 @@ public class ReMapper : MonoBehaviour {
 			kinectJointArray[22] = objectHandTipRight;
 			kinectJointArray[23] = objectThumbRight;
 
-			int i;
-			for(i=0; i<24; i++)
+			if (!hasGetInitRot)
+			{
+				for(int i=0; i<24; i++)
+				{
+					if(kinectJointArray[i] && avatarJointArray[i])
+					{
+						initialRotations[i] = avatarJointArray[i].transform.rotation;
+					}
+				}
+			}
+
+			
+			for(int i=0; i<24; i++)
 			{
 				if(kinectJointArray[i] && avatarJointArray[i])
 				{
 					//avatarJointArray [i].transform.position = kinectJointArray [i].transform.position / 10 + avatarPosition;
-					avatarJointArray [i].transform.rotation = kinectJointArray [i].transform.rotation;
-					//if (i == 0) 
-					//{
-					//}
-					//else 
-					//{
-					//	avatarJointArray [i].transform.rotation = kinectJointArray [i].transform.rotation;
-					//}
+					avatarJointArray [i].transform.rotation = kinectJointArray [i].transform.rotation ;//* initialRotations[i];
+					//avatarJointArray [i].transform.rotation = initialRotation * (kinectJointArray [i].transform.rotation * initialRotations[i]);
+
 				}
 			}
 
 
 		}
 	}
+
+	// Converts kinect joint rotation to avatar joint rotation, depending on joint initial rotation and offset rotation
+	protected Quaternion Kinect2AvatarRot(Quaternion jointRotation, int boneIndex)
+	{
+		Quaternion newRotation = jointRotation * initialRotations[boneIndex];
+		//newRotation = initialRotation * newRotation;
+
+//		if(offsetNode != null)
+//		{
+//			newRotation = offsetNode.transform.rotation * newRotation;
+//		}
+//		else
+		{
+			newRotation = initialRotation * newRotation;
+		}
+		
+		return newRotation;
+	}
+
+	protected virtual void MapBones()
+	{
+//		// make OffsetNode as a parent of model transform.
+//		offsetNode = new GameObject(name + "Ctrl") { layer = transform.gameObject.layer, tag = transform.gameObject.tag };
+//		offsetNode.transform.position = transform.position;
+//		offsetNode.transform.rotation = transform.rotation;
+//		offsetNode.transform.parent = transform.parent;
+		
+//		// take model transform as body root
+//		transform.parent = offsetNode.transform;
+//		transform.localPosition = Vector3.zero;
+//		transform.localRotation = Quaternion.identity;
+		
+		//bodyRoot = transform;
+
+		// get bone transforms from the animator component
+		//Animator animatorComponent = GetComponent<Animator>();
+				
+		for (int boneIndex = 0; boneIndex < bones.Length; boneIndex++)
+		{
+			if (!boneIndex2MecanimMap.ContainsKey(boneIndex)) 
+				continue;
+			
+			bones[boneIndex] = animatorComponent ? animatorComponent.GetBoneTransform(boneIndex2MecanimMap[boneIndex]) : null;
+		}
+	}
+
+
+	protected static readonly Dictionary<int, HumanBodyBones> boneIndex2MecanimMap = new Dictionary<int, HumanBodyBones>
+	{
+		{0, HumanBodyBones.Hips},
+		{1, HumanBodyBones.Spine},
+//        {2, HumanBodyBones.Chest},
+		{3, HumanBodyBones.Neck},
+//		{4, HumanBodyBones.Head},
+		
+		{5, HumanBodyBones.LeftUpperArm},
+		{6, HumanBodyBones.LeftLowerArm},
+		{7, HumanBodyBones.LeftHand},
+//		{8, HumanBodyBones.LeftIndexProximal},
+//		{9, HumanBodyBones.LeftIndexIntermediate},
+//		{10, HumanBodyBones.LeftThumbProximal},
+		
+		{11, HumanBodyBones.RightUpperArm},
+		{12, HumanBodyBones.RightLowerArm},
+		{13, HumanBodyBones.RightHand},
+//		{14, HumanBodyBones.RightIndexProximal},
+//		{15, HumanBodyBones.RightIndexIntermediate},
+//		{16, HumanBodyBones.RightThumbProximal},
+		
+		{17, HumanBodyBones.LeftUpperLeg},
+		{18, HumanBodyBones.LeftLowerLeg},
+		{19, HumanBodyBones.LeftFoot},
+//		{20, HumanBodyBones.LeftToes},
+		
+		{21, HumanBodyBones.RightUpperLeg},
+		{22, HumanBodyBones.RightLowerLeg},
+		{23, HumanBodyBones.RightFoot},
+//		{24, HumanBodyBones.RightToes},
+		
+		{25, HumanBodyBones.LeftShoulder},
+		{26, HumanBodyBones.RightShoulder},
+		{27, HumanBodyBones.LeftIndexProximal},
+		{28, HumanBodyBones.RightIndexProximal},
+		{29, HumanBodyBones.LeftThumbProximal},
+		{30, HumanBodyBones.RightThumbProximal},
+	};
+	
 }
